@@ -19,11 +19,13 @@
   #tooltip .title { font-weight: 600; margin-bottom: 4px; color: #fff; }
   #tooltip .desc { color: #aaa; font-size: 13px; }
   #tooltip .date { color: #666; font-size: 11px; margin-top: 6px; }
+  #error { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #e74c3c; font-size: 18px; }
 </style>
 </head>
 <body>
 <div id="graph"></div>
 <div id="tooltip"><div class="title"></div><div class="desc"></div><div class="date"></div></div>
+<div id="error"></div>
 
 <script>
 // https://d3js.org v7.9.0 Copyright 2010-2023 Mike Bostock
@@ -31,7 +33,44 @@
 
 </script>
 <script>
-const GRAPH_DATA = {"nodes":[{"id":"act-or-ask","label":"The Collaborator That Acts or Asks","type":"article","url":"https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html","description":"Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.","date":"2026-03-19","size":60,"color":"#7f8c8d"},{"id":"tag:ai","label":"ai","type":"tag","size":30,"color":"#f39c12"},{"id":"tag:collaboration","label":"collaboration","type":"tag","size":30,"color":"#f39c12"},{"id":"tag:workflow","label":"workflow","type":"tag","size":30,"color":"#f39c12"},{"id":"tag:adaptive-execution","label":"adaptive-execution","type":"tag","size":30,"color":"#f39c12"}],"links":[{"source":"act-or-ask","target":"tag:ai"},{"source":"act-or-ask","target":"tag:collaboration"},{"source":"act-or-ask","target":"tag:workflow"},{"source":"act-or-ask","target":"tag:adaptive-execution"}]};
+// Build graph nodes + links from JSON Feed items
+function feedToGraph(feed) {
+  const nodes = [];
+  const links = [];
+  const tagNodes = new Map();
+
+  for (const item of feed.items) {
+    const slug = item.url.split('/').pop().replace('.html', '');
+    const status = item._status || 'draft';
+
+    nodes.push({
+      id: slug,
+      label: item.title,
+      type: 'article',
+      url: item.url,
+      description: item.summary || '',
+      date: item.date_published ? item.date_published.split('T')[0] : '',
+      size: 60,
+      color: status === 'published' ? '#3498db' : '#7f8c8d',
+    });
+
+    for (const tag of (item.tags || [])) {
+      if (!tagNodes.has(tag)) {
+        tagNodes.set(tag, {
+          id: 'tag:' + tag,
+          label: tag,
+          type: 'tag',
+          size: 30,
+          color: '#f39c12',
+        });
+      }
+      links.push({ source: slug, target: 'tag:' + tag });
+    }
+  }
+
+  nodes.push(...tagNodes.values());
+  return { nodes, links };
+}
 
 class PostGraph {
   constructor(containerId) {
@@ -60,8 +99,6 @@ class PostGraph {
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
       .velocityDecay(0.85)
       .alphaDecay(0.05);
-
-    this.render(GRAPH_DATA);
 
     window.addEventListener('resize', () => {
       this.width = window.innerWidth;
@@ -110,7 +147,6 @@ class PostGraph {
         .text(d.label);
     });
 
-    // Click article nodes to navigate
     nodes.filter(d => d.type === 'article')
       .on('click', (event, d) => { window.open(d.url, '_blank'); })
       .on('mouseover', (event, d) => {
@@ -134,7 +170,18 @@ class PostGraph {
   }
 }
 
-new PostGraph('graph');
+// Load feed.json → build graph → render
+fetch('./feed.json')
+  .then(r => r.json())
+  .then(feed => {
+    const graph = new PostGraph('graph');
+    graph.render(feedToGraph(feed));
+  })
+  .catch(err => {
+    const el = document.getElementById('error');
+    el.style.display = 'block';
+    el.textContent = 'Failed to load feed: ' + err.message;
+  });
 </script>
 </body>
 </html>
