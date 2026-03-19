@@ -1,0 +1,26 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Harold Young — Human Posts",
+  "home_page_url": "https://halapenyoharry.github.io/haroldyoung-human-posts",
+  "feed_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/feed.json",
+  "authors": [
+    {
+      "name": "Harold Young"
+    }
+  ],
+  "items": [
+    {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
+      "title": "The Collaborator That Acts or Asks",
+      "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
+      "date_published": "2026-03-19T00:00:00.000Z",
+      "tags": [
+        "ai",
+        "collaboration",
+        "workflow",
+        "adaptive-execution"
+      ]
+    }
+  ]
+}
