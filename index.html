@@ -168,9 +168,9 @@ class PostGraph {
     this.g = this.svg.append('g');
 
     this.simulation = d3.forceSimulation()
-      .force('link', d3.forceLink().id(d => d.id).distance(120))
-      .force('charge', d3.forceManyBody().strength(-300))
-      .force('collide', d3.forceCollide().radius(d => d.size / 2 + 10).strength(0.9))
+      .force('link', d3.forceLink().id(d => d.id).distance(160))
+      .force('charge', d3.forceManyBody().strength(-500))
+      .force('collide', d3.forceCollide().radius(d => (d._r || d.size / 2) + 8).strength(0.9))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
       .velocityDecay(0.85)
       .alphaDecay(0.05);
@@ -209,17 +209,42 @@ class PostGraph {
     nodes.each(function(d) {
       const el = d3.select(this);
 
+      // Split label into words, one per line
+      const words = d.label.replace(/-/g, ' ').split(/s+/);
+      const lineHeight = 14;
+      const padding = 12;
+
+      // Size circle to fit the words inside
+      const charWidth = 7.5;
+      const maxWordWidth = Math.max(...words.map(w => w.length)) * charWidth;
+      const textBlockHeight = words.length * lineHeight;
+      const minRadius = d.type === 'tag' ? 20 : 35;
+      const r = Math.max(minRadius, maxWordWidth / 2 + padding, textBlockHeight / 2 + padding);
+
       el.append('circle')
-        .attr('r', d.size / 2)
+        .attr('r', r)
         .attr('fill', d.color)
         .attr('stroke', d.type === 'article' ? '#fff' : 'none')
         .attr('stroke-width', d.type === 'article' ? 2 : 0)
-        .attr('opacity', d.type === 'tag' ? 0.6 : 1);
+        .attr('opacity', d.type === 'tag' ? 0.7 : 1);
 
-      el.append('text')
-        .attr('dy', d.size / 2 + 15)
+      const textEl = el.append('text')
         .attr('text-anchor', 'middle')
-        .text(d.label);
+        .attr('fill', d.type === 'article' ? '#fff' : '#1a1a2e')
+        .style('font-size', (d.type === 'tag' ? 11 : 12) + 'px')
+        .style('font-weight', d.type === 'article' ? '600' : '400')
+        .style('pointer-events', 'none');
+
+      const startY = -(words.length - 1) * lineHeight / 2;
+      words.forEach((word, i) => {
+        textEl.append('tspan')
+          .attr('x', 0)
+          .attr('dy', i === 0 ? startY : lineHeight)
+          .text(word);
+      });
+
+      // Store computed radius for collision
+      d._r = r;
     });
 
     nodes.filter(d => d.type === 'article')
