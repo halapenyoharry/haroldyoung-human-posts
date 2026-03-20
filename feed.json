@@ -37,6 +37,19 @@
       "_status": "published"
     },
     {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "title": "The Call Center Workers Should Be Training AI on Emotions",
+      "summary": "Millions of people who spent years reading strangers' emotional states through voice alone are about to lose their jobs. They're also the most calibrated emotional sensors on the planet.",
+      "tags": [
+        "ai",
+        "labor",
+        "open-source",
+        "affective-computing"
+      ],
+      "_status": "draft"
+    },
+    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/footprints-archeology.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/footprints-archeology.html",
       "title": "How Footprints in Mud Exposed the Colonial Origins of Archeology",
@@ -79,8 +92,8 @@
       "_status": "published"
     },
     {
-      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
-      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
       "title": "The Collaborator That Acts or Asks",
       "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
       "date_published": "2026-03-19T00:00:00.000Z",
