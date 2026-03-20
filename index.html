@@ -251,9 +251,22 @@ let readerIndex = 0;
 let readerPlaying = false;
 let readerVoice = null;
 
+// Curated natural-sounding voices — no novelty voices
+const GOOD_VOICES = new Set([
+  'Samantha', 'Daniel', 'Karen', 'Moira', 'Tessa', 'Rishi', 'Tara', 'Aman',
+  'Flo', 'Shelley', 'Sandy', 'Grandma', 'Grandpa', 'Reed',
+  // Google / Chrome cloud voices
+  'Google US English', 'Google UK English Male', 'Google UK English Female',
+]);
+
 function getRandomVoice() {
-  const voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
-  return voices.length ? voices[Math.floor(Math.random() * voices.length)] : null;
+  const voices = synth.getVoices().filter(v =>
+    v.lang.startsWith('en') && GOOD_VOICES.has(v.name.replace(/ \(English.*\)/, ''))
+  );
+  if (voices.length) return voices[Math.floor(Math.random() * voices.length)];
+  // Fallback: any English voice that isn't a novelty
+  const fallback = synth.getVoices().filter(v => v.lang.startsWith('en'));
+  return fallback.length ? fallback[0] : null;
 }
 
 function extractTextFromHTML(html) {
