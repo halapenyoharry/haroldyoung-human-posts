@@ -213,66 +213,83 @@ class PostGraph {
         })
       );
 
+    // Hidden text for measuring pixel widths
+    const probe = this.svg.append('text')
+      .style('font-family', "'Atkinson', sans-serif")
+      .style('visibility', 'hidden');
+
     nodes.each(function(d) {
       const el = d3.select(this);
 
-      // Split on hyphens and spaces — keep each word whole
-      const words = d.label.split(/[-s]+/);
+      if (d.type === 'tag') {
+        // ─── Tags: pill bubbles ───────────────────────────────────────────
+        const fontSize = 14;
+        const padX = 14;
+        const padY = 8;
 
-      // Fixed radius per type — all same size, text scales to fit
-      const r = d.type === 'tag' ? 40 : 55;
+        probe.style('font-size', fontSize + 'px').style('font-weight', '400');
+        probe.text(d.label);
+        const textW = probe.node().getComputedTextLength();
+        const bubbleW = textW + padX * 2;
+        const bubbleH = fontSize * 1.4 + padY * 2;
 
-      // Dynamic font size based on radius and longest word
-      const longestWord = words.reduce((a, b) => a.length > b.length ? a : b, '');
-      const getFontSize = (text, radius) => {
-        const baseSize = radius / 3;
-        if (text.length > 10) return baseSize * (10 / text.length);
-        if (text.length > 8) return baseSize * 0.9;
-        return baseSize;
-      };
+        el.append('rect')
+          .attr('x', -bubbleW / 2).attr('y', -bubbleH / 2)
+          .attr('width', bubbleW).attr('height', bubbleH)
+          .attr('rx', bubbleH / 2).attr('ry', bubbleH / 2)
+          .attr('fill', d.color).attr('opacity', 0.7);
 
-      // Also account for number of lines needing vertical space
-      let fontSize = getFontSize(longestWord, r);
-      const lineHeight = fontSize * 1.4;
-      const totalTextHeight = words.length * lineHeight;
-      const usableHeight = r * 2 * 0.75; // 75% of diameter
-      if (totalTextHeight > usableHeight) {
-        fontSize = fontSize * (usableHeight / totalTextHeight);
+        el.append('text')
+          .attr('x', 0).attr('y', 0)
+          .attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+          .attr('fill', '#1a1a2e')
+          .style('font-size', fontSize + 'px').style('font-weight', '400')
+          .style('pointer-events', 'none')
+          .text(d.label);
+
+        d._r = Math.max(bubbleW, bubbleH) / 2;
+
+      } else {
+        // ─── Articles: HTML card via foreignObject ────────────────────────
+        const cardW = 180;
+        const cardH = 140;
+        const status = d.color === '#7f8c8d' ? 'draft' : 'published';
+        const bgColor = status === 'draft' ? '#2a2a3e' : '#1e3a5f';
+        const borderColor = status === 'draft' ? '#555' : '#3498db';
+        const desc = d.description || '';
+
+        el.append('foreignObject')
+          .attr('width', cardW).attr('height', cardH)
+          .attr('x', -cardW / 2).attr('y', -cardH / 2)
+          .append('xhtml:div')
+          .attr('xmlns', 'http://www.w3.org/1999/xhtml')
+          .style('width', cardW + 'px').style('height', cardH + 'px')
+          .style('background', bgColor)
+          .style('border', '1.5px solid ' + borderColor)
+          .style('border-radius', '4px')
+          .style('padding', '10px 12px')
+          .style('box-sizing', 'border-box')
+          .style('overflow', 'hidden')
+          .style('font-family', "'Atkinson', sans-serif")
+          .style('cursor', 'pointer')
+          .style('overflow', 'hidden')
+          .html((() => {
+            const preview = desc.length > 120 ? desc.slice(0, 117) + '...' : desc;
+            return `
+              <span style="font-size:15px;font-weight:700;color:#fff;line-height:1.3;">
+                ${d.title || d.label}
+              </span>
+              ${preview ? `<br><span style="zoom:0.65;font-size:15px;color:rgba(255,255,255,0.35);line-height:1.3;font-style:italic;">
+                ${preview}
+              </span>` : ''}
+            `;
+          })());
+
+        d._r = Math.max(cardW, cardH) / 2;
       }
-      fontSize = Math.max(fontSize, 8); // floor
-
-      el.append('circle')
-        .attr('r', r)
-        .attr('fill', d.color)
-        .attr('stroke', d.type === 'article' ? '#fff' : 'none')
-        .attr('stroke-width', d.type === 'article' ? 2 : 0)
-        .attr('opacity', d.type === 'tag' ? 0.7 : 1);
-
-      const actualLineHeight = fontSize * 1.4;
-      const totalHeight = words.length * actualLineHeight;
-      const startY = -(totalHeight - actualLineHeight) / 2;
-
-      const textEl = el.append('text')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('text-anchor', 'middle')
-        .attr('dominant-baseline', 'central')
-        .attr('fill', d.type === 'article' ? '#fff' : '#1a1a2e')
-        .style('font-size', fontSize + 'px')
-        .style('font-weight', d.type === 'article' ? '600' : '400')
-        .style('pointer-events', 'none')
-        .style('white-space', 'nowrap')
-        .style('overflow', 'visible');
-
-      words.forEach((word, i) => {
-        textEl.append('tspan')
-          .attr('x', 0)
-          .attr('dy', i === 0 ? startY : actualLineHeight)
-          .text(word);
-      });
-
-      d._r = r;
     });
+
+    probe.remove();
 
     nodes.filter(d => d.type === 'article')
       .on('click', (event, d) => { openReader(d); })
