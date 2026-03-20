@@ -1,8 +1,9 @@
 // tts-reader.js — Standalone TTS reader module for post-pipe
+// Two engines: Browser TTS (instant) and Kokoro (high quality, loads model from HuggingFace)
 // Provides: openReader(d), closeReader() + wires up panel buttons
 // Expects DOM: #reader-panel, #reader-overlay, #reader-body, #readerTitle,
 //   #readerVoice, #readerPlay, #readerPause, #readerStop, #readerClose,
-//   #reader-progress-fill
+//   #reader-progress-fill, #readerEngine
 
 (function() {
   'use strict';
@@ -11,10 +12,25 @@
   let sentences = [];
   let sentenceIndex = 0;
   let playing = false;
-  let voice = null;
+  let browserVoice = null;
+  let currentAudio = null; // for Kokoro playback
 
-  // Curated natural-sounding voices — no novelty voices
-  const GOOD_VOICES = new Set([
+  // Engine state: 'browser' or 'kokoro'
+  let engine = 'browser';
+  let kokoroWorker = null;
+  let kokoroReady = false;
+  let kokoroVoices = [];
+  let kokoroVoice = null;
+
+  // Best Kokoro voices (grade B- or above)
+  const KOKORO_BEST = [
+    'af_heart', 'af_bella', 'af_nicole', 'af_aoede', 'af_kore', 'af_sarah',
+    'am_fenrir', 'am_michael', 'am_puck',
+    'bf_emma', 'bm_fable', 'bm_george',
+  ];
+
+  // Curated browser voices — no novelty voices
+  const GOOD_BROWSER_VOICES = new Set([
     'Samantha', 'Daniel', 'Karen', 'Moira', 'Tessa', 'Rishi', 'Tara', 'Aman',
     'Flo', 'Shelley', 'Sandy', 'Grandma', 'Grandpa', 'Reed',
     'Google US English', 'Google UK English Male', 'Google UK English Female',
@@ -24,14 +40,94 @@
     return name.replace(/ \(English.*\)/, '');
   }
 
-  function getRandomVoice() {
+  function getRandomBrowserVoice() {
     const good = synth.getVoices().filter(v =>
-      v.lang.startsWith('en') && GOOD_VOICES.has(stripVoiceSuffix(v.name))
+      v.lang.startsWith('en') && GOOD_BROWSER_VOICES.has(stripVoiceSuffix(v.name))
     );
     if (good.length) return good[Math.floor(Math.random() * good.length)];
     const fallback = synth.getVoices().filter(v => v.lang.startsWith('en'));
     return fallback.length ? fallback[0] : null;
   }
+
+  function getRandomKokoroVoice() {
+    const available = KOKORO_BEST.filter(v => kokoroVoices.includes(v));
+    if (available.length) return available[Math.floor(Math.random() * available.length)];
+    return kokoroVoices.length ? kokoroVoices[0] : 'af_heart';
+  }
+
+  // ─── Kokoro Worker ──────────────────────────────────────────────────────────
+
+  function initKokoro() {
+    if (kokoroWorker) return;
+
+    const voiceLabel = document.getElementById('readerVoice');
+    voiceLabel.textContent = 'Loading Kokoro model...';
+
+    kokoroWorker = new Worker('./kokoro-worker.js', { type: 'module' });
+    kokoroWorker.addEventListener('message', (e) => {
+      const msg = e.data;
+
+      if (msg.status === 'loading') {
+        voiceLabel.textContent = 'Loading model (' + msg.device + ')...';
+      }
+      if (msg.status === 'ready') {
+        kokoroReady = true;
+        kokoroVoices = msg.voices || [];
+        kokoroVoice = getRandomKokoroVoice();
+        voiceLabel.textContent = 'Kokoro: ' + kokoroVoice;
+      }
+      if (msg.status === 'generating') {
+        voiceLabel.textContent = 'Generating audio...';
+      }
+      if (msg.status === 'complete') {
+        voiceLabel.textContent = 'Kokoro: ' + kokoroVoice;
+        playAudioBlob(msg.audio);
+      }
+      if (msg.status === 'error') {
+        voiceLabel.textContent = 'Kokoro error: ' + msg.error;
+        // Fall back to browser TTS
+        engine = 'browser';
+        updateEngineButton();
+      }
+    });
+  }
+
+  function playAudioBlob(url) {
+    stopAudio();
+    currentAudio = new Audio(url);
+    currentAudio.onended = () => {
+      sentenceIndex++;
+      updateProgress();
+      if (playing && sentenceIndex < sentences.length) {
+        kokoroGenerateNext();
+      } else {
+        stop();
+      }
+    };
+    currentAudio.play();
+  }
+
+  function stopAudio() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      currentAudio = null;
+    }
+  }
+
+  function kokoroGenerateNext() {
+    if (!playing || sentenceIndex >= sentences.length) {
+      stop();
+      return;
+    }
+    kokoroWorker.postMessage({
+      action: 'generate',
+      text: sentences[sentenceIndex],
+      voice: kokoroVoice,
+    });
+  }
+
+  // ─── Content extraction ────────────────────────────────────────────────────
 
   function extractContent(html) {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -48,43 +144,69 @@
     document.getElementById('reader-progress-fill').style.width = pct + '%';
   }
 
-  function speakNext() {
+  // ─── Browser TTS ───────────────────────────────────────────────────────────
+
+  function browserSpeakNext() {
     if (!playing || sentenceIndex >= sentences.length) {
       stop();
       return;
     }
     const utterance = new SpeechSynthesisUtterance(sentences[sentenceIndex]);
-    if (voice) utterance.voice = voice;
+    if (browserVoice) utterance.voice = browserVoice;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.onend = () => {
       sentenceIndex++;
       updateProgress();
-      if (playing) setTimeout(speakNext, 80);
+      if (playing) setTimeout(browserSpeakNext, 80);
     };
     synth.speak(utterance);
   }
 
+  // ─── Unified controls ─────────────────────────────────────────────────────
+
   function play() {
-    if (!sentences.length || !synth) return;
+    if (!sentences.length) return;
     playing = true;
     document.getElementById('readerPlay').style.display = 'none';
     document.getElementById('readerPause').style.display = '';
     document.getElementById('readerStop').style.display = '';
-    speakNext();
+
+    if (engine === 'kokoro') {
+      if (!kokoroReady) {
+        document.getElementById('readerVoice').textContent = 'Model still loading...';
+        playing = false;
+        document.getElementById('readerPlay').style.display = '';
+        document.getElementById('readerPause').style.display = 'none';
+        return;
+      }
+      kokoroGenerateNext();
+    } else {
+      browserSpeakNext();
+    }
   }
 
   function pause() {
-    synth.pause();
     playing = false;
     document.getElementById('readerPlay').style.display = '';
     document.getElementById('readerPlay').textContent = 'Resume';
     document.getElementById('readerPause').style.display = 'none';
+
+    if (engine === 'browser') {
+      synth.pause();
+    } else {
+      if (currentAudio) currentAudio.pause();
+    }
   }
 
   function resume() {
-    if (synth.paused) {
+    if (engine === 'browser' && synth.paused) {
       synth.resume();
+      playing = true;
+      document.getElementById('readerPlay').style.display = 'none';
+      document.getElementById('readerPause').style.display = '';
+    } else if (engine === 'kokoro' && currentAudio && currentAudio.paused) {
+      currentAudio.play();
       playing = true;
       document.getElementById('readerPlay').style.display = 'none';
       document.getElementById('readerPause').style.display = '';
@@ -94,14 +216,40 @@
   }
 
   function stop() {
-    synth.cancel();
     playing = false;
     sentenceIndex = 0;
+    synth.cancel();
+    stopAudio();
     document.getElementById('readerPlay').style.display = '';
     document.getElementById('readerPlay').textContent = 'Play';
     document.getElementById('readerPause').style.display = 'none';
     document.getElementById('readerStop').style.display = 'none';
     updateProgress();
+  }
+
+  function updateEngineButton() {
+    const btn = document.getElementById('readerEngine');
+    if (!btn) return;
+    btn.textContent = engine === 'browser' ? 'Browser' : 'Kokoro';
+    btn.classList.toggle('active', engine === 'kokoro');
+  }
+
+  function toggleEngine() {
+    stop();
+    engine = engine === 'browser' ? 'kokoro' : 'browser';
+    updateEngineButton();
+
+    const voiceLabel = document.getElementById('readerVoice');
+    if (engine === 'kokoro') {
+      initKokoro();
+      if (kokoroReady) {
+        kokoroVoice = getRandomKokoroVoice();
+        voiceLabel.textContent = 'Kokoro: ' + kokoroVoice;
+      }
+    } else {
+      browserVoice = getRandomBrowserVoice();
+      voiceLabel.textContent = browserVoice ? browserVoice.name : 'No voice';
+    }
   }
 
   // ─── Public API ──────────────────────────────────────────────────────────────
@@ -119,8 +267,14 @@
     panel.style.display = 'flex';
     overlay.style.display = 'block';
 
-    voice = getRandomVoice();
-    voiceLabel.textContent = voice ? voice.name : 'No voice';
+    if (engine === 'browser') {
+      browserVoice = getRandomBrowserVoice();
+      voiceLabel.textContent = browserVoice ? browserVoice.name : 'No voice';
+    } else {
+      kokoroVoice = getRandomKokoroVoice();
+      voiceLabel.textContent = kokoroReady ? 'Kokoro: ' + kokoroVoice : 'Loading model...';
+    }
+    updateEngineButton();
 
     fetch(d.url)
       .then(r => r.text())
@@ -147,13 +301,21 @@
 
   function wireButtons() {
     document.getElementById('readerPlay').addEventListener('click', () => {
-      if (synth.paused) resume();
-      else play();
+      if ((engine === 'browser' && synth.paused) ||
+          (engine === 'kokoro' && currentAudio && currentAudio.paused)) {
+        resume();
+      } else {
+        play();
+      }
     });
     document.getElementById('readerPause').addEventListener('click', pause);
     document.getElementById('readerStop').addEventListener('click', stop);
     document.getElementById('readerClose').addEventListener('click', window.closeReader);
     document.getElementById('reader-overlay').addEventListener('click', window.closeReader);
+
+    const engineBtn = document.getElementById('readerEngine');
+    if (engineBtn) engineBtn.addEventListener('click', toggleEngine);
+
     synth.addEventListener('voiceschanged', () => {});
   }
 
