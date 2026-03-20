@@ -216,27 +216,37 @@ class PostGraph {
 
       // Split on hyphens and spaces — keep each word whole
       const words = d.label.split(/[-s]+/);
-      const fontSize = d.type === 'tag' ? 11 : 13;
 
-      // Measure each word's actual pixel width
-      measureText.style('font-size', fontSize + 'px')
-        .style('font-weight', d.type === 'article' ? '600' : '400');
-      const wordWidths = words.map(w => {
-        measureText.text(w);
-        return measureText.node().getComputedTextLength();
-      });
-      const maxWordWidth = Math.max(...wordWidths);
+      // Target max radius so circles don't get absurdly large
+      const maxRadius = d.type === 'tag' ? 45 : 65;
+      const minRadius = d.type === 'tag' ? 28 : 40;
 
-      const lineHeight = fontSize * 1.3;
-      const textBlockHeight = words.length * lineHeight;
+      // Try font sizes from large to small until text fits in maxRadius
+      let fontSize, maxWordWidth, lineHeight, textBlockHeight, r;
+      const sizes = d.type === 'tag' ? [12, 11, 10, 9] : [14, 13, 12, 11, 10];
 
-      // Circle must contain text with 10% diameter margin on each side
-      // So usable diameter = 80% of actual diameter
-      // radius = max(textWidth, textHeight) / 2 / 0.8
-      const minRadius = d.type === 'tag' ? 22 : 36;
-      const rForWidth = (maxWordWidth / 2) / 0.8;
-      const rForHeight = (textBlockHeight / 2) / 0.8;
-      const r = Math.max(minRadius, rForWidth + 4, rForHeight + 4);
+      for (const size of sizes) {
+        fontSize = size;
+        measureText.style('font-size', size + 'px')
+          .style('font-weight', d.type === 'article' ? '600' : '400');
+
+        const wordWidths = words.map(w => {
+          measureText.text(w);
+          return measureText.node().getComputedTextLength();
+        });
+        maxWordWidth = Math.max(...wordWidths);
+        lineHeight = size * 1.35;
+        textBlockHeight = words.length * lineHeight;
+
+        // Need text to fit within 80% of diameter (10% margin each side)
+        const rForWidth = (maxWordWidth / 2) / 0.75;
+        const rForHeight = (textBlockHeight / 2) / 0.75;
+        r = Math.max(minRadius, rForWidth + 4, rForHeight + 4);
+
+        if (r <= maxRadius) break;
+      }
+      // Clamp
+      r = Math.min(r, maxRadius);
 
       el.append('circle')
         .attr('r', r)
