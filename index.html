@@ -26,12 +26,78 @@
   #tooltip .desc { color: #aaa; font-size: 13px; }
   #tooltip .date { color: #666; font-size: 11px; margin-top: 6px; }
   #error { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #e74c3c; font-size: 18px; }
+
+  /* Reader panel */
+  #reader-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7); z-index: 100;
+  }
+  #reader-panel {
+    position: fixed; top: 0; right: 0; width: 55vw; height: 100vh;
+    background: #0a0e1a; border-left: 1px solid rgba(100, 255, 218, 0.2);
+    z-index: 101; display: flex; flex-direction: column; overflow: hidden;
+    font-family: 'OpenDyslexic', sans-serif;
+  }
+  @media (max-width: 900px) { #reader-panel { width: 100vw; } }
+  #reader-header {
+    padding: 16px 24px; background: rgba(17, 24, 39, 0.9);
+    border-bottom: 1px solid rgba(100, 255, 218, 0.15);
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  #reader-header .reader-title {
+    flex: 1; color: #64ffda; font-size: 15px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #reader-header .reader-voice {
+    color: #8892b0; font-size: 11px; max-width: 180px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .reader-btn {
+    background: transparent; border: 1px solid rgba(100, 255, 218, 0.3);
+    color: #64ffda; padding: 6px 14px; font-size: 12px; cursor: pointer;
+    font-family: 'OpenDyslexic', sans-serif; text-transform: uppercase;
+    letter-spacing: 0.05em; transition: all 0.2s;
+  }
+  .reader-btn:hover { background: rgba(100, 255, 218, 0.1); border-color: #64ffda; }
+  .reader-btn.active { background: rgba(100, 255, 218, 0.15); border-color: #64ffda; }
+  .reader-btn.close-btn { border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
+  .reader-btn.close-btn:hover { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+  #reader-body {
+    flex: 1; overflow-y: auto; padding: 32px 40px; line-height: 1.9;
+    font-size: 15px; color: #a8b2d1;
+  }
+  #reader-body::-webkit-scrollbar { width: 8px; }
+  #reader-body::-webkit-scrollbar-track { background: rgba(17, 24, 39, 0.5); }
+  #reader-body::-webkit-scrollbar-thumb { background: rgba(100, 255, 218, 0.3); }
+  #reader-body h1, #reader-body h2, #reader-body h3 { color: #ccd6f6; margin: 24px 0 12px; font-weight: 600; }
+  #reader-body h1 { font-size: 22px; color: #64ffda; border-bottom: 1px solid rgba(100, 255, 218, 0.2); padding-bottom: 12px; }
+  #reader-body h2 { font-size: 18px; }
+  #reader-body p { margin-bottom: 16px; }
+  #reader-body blockquote { border-left: 3px solid #64ffda; padding: 12px 20px; margin: 16px 0; background: rgba(100, 255, 218, 0.03); }
+  #reader-body ul, #reader-body ol { padding-left: 24px; margin-bottom: 16px; }
+  #reader-body li { margin-bottom: 8px; }
+  #reader-body .current-sentence { background: rgba(100, 255, 218, 0.15); color: #64ffda; padding: 1px 3px; transition: all 0.3s; }
+  #reader-progress { height: 3px; background: rgba(148, 163, 184, 0.1); flex-shrink: 0; }
+  #reader-progress-fill { height: 100%; background: #64ffda; width: 0%; transition: width 0.3s; }
 </style>
 </head>
 <body>
 <div id="graph"></div>
 <div id="tooltip"><div class="title"></div><div class="desc"></div><div class="date"></div></div>
 <div id="error"></div>
+<div id="reader-overlay"></div>
+<div id="reader-panel" style="display:none;">
+  <div id="reader-header">
+    <span class="reader-title" id="readerTitle"></span>
+    <span class="reader-voice" id="readerVoice"></span>
+    <button class="reader-btn" id="readerPlay">Play</button>
+    <button class="reader-btn" id="readerPause" style="display:none;">Pause</button>
+    <button class="reader-btn" id="readerStop" style="display:none;">Stop</button>
+    <button class="reader-btn close-btn" id="readerClose">Close</button>
+  </div>
+  <div id="reader-progress"><div id="reader-progress-fill"></div></div>
+  <div id="reader-body"></div>
+</div>
 
 <script>
 // https://d3js.org v7.9.0 Copyright 2010-2023 Mike Bostock
@@ -155,7 +221,7 @@ class PostGraph {
     });
 
     nodes.filter(d => d.type === 'article')
-      .on('click', (event, d) => { window.open(d.url, '_blank'); })
+      .on('click', (event, d) => { openReader(d); })
       .on('mouseover', (event, d) => {
         this.tooltip.style.display = 'block';
         this.tooltip.querySelector('.title').textContent = d.title || d.label;
@@ -176,6 +242,144 @@ class PostGraph {
     this.simulation.force('link').links(data.links);
   }
 }
+
+// ─── Reader + TTS ────────────────────────────────────────────────────────────
+
+const synth = window.speechSynthesis;
+let readerSentences = [];
+let readerIndex = 0;
+let readerPlaying = false;
+let readerVoice = null;
+
+function getRandomVoice() {
+  const voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+  return voices.length ? voices[Math.floor(Math.random() * voices.length)] : null;
+}
+
+function extractTextFromHTML(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  // Remove Quarto chrome: nav, header, footer, scripts, styles
+  doc.querySelectorAll('nav, header, footer, script, style, .quarto-title-block').forEach(el => el.remove());
+  return doc.querySelector('main') || doc.querySelector('.content') || doc.querySelector('article') || doc.body;
+}
+
+function splitSentences(text) {
+  return text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
+}
+
+function openReader(d) {
+  const panel = document.getElementById('reader-panel');
+  const overlay = document.getElementById('reader-overlay');
+  const body = document.getElementById('reader-body');
+  const title = document.getElementById('readerTitle');
+  const voiceLabel = document.getElementById('readerVoice');
+
+  stopReading();
+  title.textContent = d.title || d.label;
+  body.innerHTML = '<p style="color:#64ffda;">Loading...</p>';
+  panel.style.display = 'flex';
+  overlay.style.display = 'block';
+
+  // Pick random English voice
+  readerVoice = getRandomVoice();
+  voiceLabel.textContent = readerVoice ? readerVoice.name : 'No voice';
+
+  fetch(d.url)
+    .then(r => r.text())
+    .then(html => {
+      const content = extractTextFromHTML(html);
+      body.innerHTML = '';
+      // Clone nodes to preserve structure
+      Array.from(content.childNodes).forEach(n => body.appendChild(n.cloneNode(true)));
+      // Prepare sentences from plain text
+      readerSentences = splitSentences(body.textContent);
+      readerIndex = 0;
+      updateReaderProgress();
+    })
+    .catch(err => {
+      body.innerHTML = '<p style="color:#ef4444;">Failed to load: ' + err.message + '</p>';
+    });
+}
+
+function closeReader() {
+  stopReading();
+  document.getElementById('reader-panel').style.display = 'none';
+  document.getElementById('reader-overlay').style.display = 'none';
+}
+
+function startReading() {
+  if (!readerSentences.length || !synth) return;
+  readerPlaying = true;
+  document.getElementById('readerPlay').style.display = 'none';
+  document.getElementById('readerPause').style.display = '';
+  document.getElementById('readerStop').style.display = '';
+  speakNext();
+}
+
+function speakNext() {
+  if (!readerPlaying || readerIndex >= readerSentences.length) {
+    stopReading();
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(readerSentences[readerIndex]);
+  if (readerVoice) utterance.voice = readerVoice;
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+  utterance.onend = () => {
+    readerIndex++;
+    updateReaderProgress();
+    if (readerPlaying) setTimeout(speakNext, 80);
+  };
+  synth.speak(utterance);
+}
+
+function pauseReading() {
+  synth.pause();
+  readerPlaying = false;
+  document.getElementById('readerPlay').style.display = '';
+  document.getElementById('readerPlay').textContent = 'Resume';
+  document.getElementById('readerPause').style.display = 'none';
+}
+
+function resumeReading() {
+  if (synth.paused) {
+    synth.resume();
+    readerPlaying = true;
+    document.getElementById('readerPlay').style.display = 'none';
+    document.getElementById('readerPause').style.display = '';
+  } else {
+    startReading();
+  }
+}
+
+function stopReading() {
+  synth.cancel();
+  readerPlaying = false;
+  readerIndex = 0;
+  document.getElementById('readerPlay').style.display = '';
+  document.getElementById('readerPlay').textContent = 'Play';
+  document.getElementById('readerPause').style.display = 'none';
+  document.getElementById('readerStop').style.display = 'none';
+  updateReaderProgress();
+}
+
+function updateReaderProgress() {
+  const pct = readerSentences.length ? (readerIndex / readerSentences.length * 100) : 0;
+  document.getElementById('reader-progress-fill').style.width = pct + '%';
+}
+
+// Wire up buttons
+document.getElementById('readerPlay').addEventListener('click', () => {
+  if (synth.paused) resumeReading();
+  else startReading();
+});
+document.getElementById('readerPause').addEventListener('click', pauseReading);
+document.getElementById('readerStop').addEventListener('click', stopReading);
+document.getElementById('readerClose').addEventListener('click', closeReader);
+document.getElementById('reader-overlay').addEventListener('click', closeReader);
+
+// Ensure voices are loaded
+synth.addEventListener('voiceschanged', () => {});
 
 // Load feed.json → build graph → render
 fetch('./feed.json')
