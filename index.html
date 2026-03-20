@@ -14,8 +14,9 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #1a1a2e; color: #e0e0e0; font-family: 'OpenDyslexic', sans-serif; overflow: hidden; }
   #graph { width: 100vw; height: 100vh; }
-  .node { cursor: pointer; }
-  .node text { font-size: 13px; fill: #ccc; pointer-events: none; font-family: 'OpenDyslexic', sans-serif; }
+  .node { cursor: pointer; overflow: visible; }
+  .node text { fill: #ccc; pointer-events: none; font-family: 'OpenDyslexic', sans-serif; overflow: visible; paint-order: markers fill stroke; }
+  svg { overflow: visible; }
   .link { stroke: #555; stroke-opacity: 0.4; stroke-width: 1.5; }
   #tooltip {
     position: fixed; display: none; background: #16213e; border: 1px solid #0f3460;
@@ -206,47 +207,33 @@ class PostGraph {
         })
       );
 
-    // Measure text using a hidden SVG text element
-    const measureText = this.svg.append('text')
-      .style('font-family', "'OpenDyslexic', sans-serif")
-      .style('visibility', 'hidden');
-
     nodes.each(function(d) {
       const el = d3.select(this);
 
       // Split on hyphens and spaces — keep each word whole
       const words = d.label.split(/[-s]+/);
 
-      // Target max radius so circles don't get absurdly large
-      const maxRadius = d.type === 'tag' ? 45 : 65;
-      const minRadius = d.type === 'tag' ? 28 : 40;
+      // Fixed radius per type — all same size, text scales to fit
+      const r = d.type === 'tag' ? 40 : 55;
 
-      // Try font sizes from large to small until text fits in maxRadius
-      let fontSize, maxWordWidth, lineHeight, textBlockHeight, r;
-      const sizes = d.type === 'tag' ? [12, 11, 10, 9] : [14, 13, 12, 11, 10];
+      // Dynamic font size based on radius and longest word
+      const longestWord = words.reduce((a, b) => a.length > b.length ? a : b, '');
+      const getFontSize = (text, radius) => {
+        const baseSize = radius / 3;
+        if (text.length > 10) return baseSize * (10 / text.length);
+        if (text.length > 8) return baseSize * 0.9;
+        return baseSize;
+      };
 
-      for (const size of sizes) {
-        fontSize = size;
-        measureText.style('font-size', size + 'px')
-          .style('font-weight', d.type === 'article' ? '600' : '400');
-
-        const wordWidths = words.map(w => {
-          measureText.text(w);
-          return measureText.node().getComputedTextLength();
-        });
-        maxWordWidth = Math.max(...wordWidths);
-        lineHeight = size * 1.35;
-        textBlockHeight = words.length * lineHeight;
-
-        // Need text to fit within 80% of diameter (10% margin each side)
-        const rForWidth = (maxWordWidth / 2) / 0.75;
-        const rForHeight = (textBlockHeight / 2) / 0.75;
-        r = Math.max(minRadius, rForWidth + 4, rForHeight + 4);
-
-        if (r <= maxRadius) break;
+      // Also account for number of lines needing vertical space
+      let fontSize = getFontSize(longestWord, r);
+      const lineHeight = fontSize * 1.4;
+      const totalTextHeight = words.length * lineHeight;
+      const usableHeight = r * 2 * 0.75; // 75% of diameter
+      if (totalTextHeight > usableHeight) {
+        fontSize = fontSize * (usableHeight / totalTextHeight);
       }
-      // Clamp
-      r = Math.min(r, maxRadius);
+      fontSize = Math.max(fontSize, 8); // floor
 
       el.append('circle')
         .attr('r', r)
@@ -255,27 +242,31 @@ class PostGraph {
         .attr('stroke-width', d.type === 'article' ? 2 : 0)
         .attr('opacity', d.type === 'tag' ? 0.7 : 1);
 
+      const actualLineHeight = fontSize * 1.4;
+      const totalHeight = words.length * actualLineHeight;
+      const startY = -(totalHeight - actualLineHeight) / 2;
+
       const textEl = el.append('text')
+        .attr('x', 0)
+        .attr('y', 0)
         .attr('text-anchor', 'middle')
         .attr('dominant-baseline', 'central')
         .attr('fill', d.type === 'article' ? '#fff' : '#1a1a2e')
         .style('font-size', fontSize + 'px')
         .style('font-weight', d.type === 'article' ? '600' : '400')
-        .style('pointer-events', 'none');
+        .style('pointer-events', 'none')
+        .style('white-space', 'nowrap')
+        .style('overflow', 'visible');
 
-      // Center the text block vertically: first tspan offset
-      const topY = -((words.length - 1) * lineHeight) / 2;
       words.forEach((word, i) => {
         textEl.append('tspan')
           .attr('x', 0)
-          .attr('dy', i === 0 ? topY : lineHeight)
+          .attr('dy', i === 0 ? startY : actualLineHeight)
           .text(word);
       });
 
       d._r = r;
     });
-
-    measureText.remove();
 
     nodes.filter(d => d.type === 'article')
       .on('click', (event, d) => { openReader(d); })
