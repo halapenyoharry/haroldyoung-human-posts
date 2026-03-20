@@ -206,20 +206,37 @@ class PostGraph {
         })
       );
 
+    // Measure text using a hidden SVG text element
+    const measureText = this.svg.append('text')
+      .style('font-family', "'OpenDyslexic', sans-serif")
+      .style('visibility', 'hidden');
+
     nodes.each(function(d) {
       const el = d3.select(this);
 
-      // Split label into words, one per line
-      const words = d.label.replace(/-/g, ' ').split(/s+/);
-      const lineHeight = 14;
-      const padding = 12;
+      // Split on hyphens and spaces — keep each word whole
+      const words = d.label.split(/[-s]+/);
+      const fontSize = d.type === 'tag' ? 11 : 13;
 
-      // Size circle to fit the words inside
-      const charWidth = 7.5;
-      const maxWordWidth = Math.max(...words.map(w => w.length)) * charWidth;
+      // Measure each word's actual pixel width
+      measureText.style('font-size', fontSize + 'px')
+        .style('font-weight', d.type === 'article' ? '600' : '400');
+      const wordWidths = words.map(w => {
+        measureText.text(w);
+        return measureText.node().getComputedTextLength();
+      });
+      const maxWordWidth = Math.max(...wordWidths);
+
+      const lineHeight = fontSize * 1.3;
       const textBlockHeight = words.length * lineHeight;
-      const minRadius = d.type === 'tag' ? 20 : 35;
-      const r = Math.max(minRadius, maxWordWidth / 2 + padding, textBlockHeight / 2 + padding);
+
+      // Circle must contain text with 10% diameter margin on each side
+      // So usable diameter = 80% of actual diameter
+      // radius = max(textWidth, textHeight) / 2 / 0.8
+      const minRadius = d.type === 'tag' ? 22 : 36;
+      const rForWidth = (maxWordWidth / 2) / 0.8;
+      const rForHeight = (textBlockHeight / 2) / 0.8;
+      const r = Math.max(minRadius, rForWidth + 4, rForHeight + 4);
 
       el.append('circle')
         .attr('r', r)
@@ -230,22 +247,25 @@ class PostGraph {
 
       const textEl = el.append('text')
         .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'central')
         .attr('fill', d.type === 'article' ? '#fff' : '#1a1a2e')
-        .style('font-size', (d.type === 'tag' ? 11 : 12) + 'px')
+        .style('font-size', fontSize + 'px')
         .style('font-weight', d.type === 'article' ? '600' : '400')
         .style('pointer-events', 'none');
 
-      const startY = -(words.length - 1) * lineHeight / 2;
+      // Center the text block vertically: first tspan offset
+      const topY = -((words.length - 1) * lineHeight) / 2;
       words.forEach((word, i) => {
         textEl.append('tspan')
           .attr('x', 0)
-          .attr('dy', i === 0 ? startY : lineHeight)
+          .attr('dy', i === 0 ? topY : lineHeight)
           .text(word);
       });
 
-      // Store computed radius for collision
       d._r = r;
     });
+
+    measureText.remove();
 
     nodes.filter(d => d.type === 'article')
       .on('click', (event, d) => { openReader(d); })
