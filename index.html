@@ -131,6 +131,7 @@ function feedToGraph(feed) {
       type: 'article',
       url: item.url,
       description: item.summary || '',
+      image: item.image || '',
       date: item.date_published ? item.date_published.split('T')[0] : '',
       size: 60,
       color: status === 'published' ? '#3498db' : '#7f8c8d',
@@ -255,6 +256,7 @@ class PostGraph {
         const cardH = 140;
         const status = d.color === '#7f8c8d' ? 'draft' : 'published';
         const bgColor = status === 'draft' ? '#2a2a3e' : '#1e3a5f';
+        const bgImage = d.image ? `linear-gradient(${status === 'draft' ? 'rgba(42,42,62,0.85)' : 'rgba(30,58,95,0.85)'}, ${status === 'draft' ? 'rgba(42,42,62,0.85)' : 'rgba(30,58,95,0.85)'}), url('${d.image}')` : bgColor;
         const borderColor = status === 'draft' ? '#555' : '#3498db';
         const desc = d.description || '';
 
@@ -264,7 +266,9 @@ class PostGraph {
           .append('xhtml:div')
           .attr('xmlns', 'http://www.w3.org/1999/xhtml')
           .style('width', cardW + 'px').style('height', cardH + 'px')
-          .style('background', bgColor)
+          .style('background', bgImage)
+          .style('background-size', 'cover')
+          .style('background-position', 'center')
           .style('border', '1.5px solid ' + borderColor)
           .style('border-radius', '4px')
           .style('padding', '10px 12px')
