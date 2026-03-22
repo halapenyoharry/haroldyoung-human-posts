@@ -13,6 +13,7 @@
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
       "title": "AI Oligarchs Are Driving Without Insurance",
+      "short_title": "AI Insurance",
       "summary": "OpenAI operates machines that introduce far greater systemic risk than any vehicle, yet they are entirely exempt from liability insurance.",
       "date_published": "2026-03-18T00:00:00.000Z",
       "tags": [
@@ -24,9 +25,26 @@
       "_status": "published"
     },
     {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/effortless-action.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/effortless-action.html",
+      "title": "The Mechanics of Effortless Action vs. Calculated Compliance",
+      "short_title": "Effortless Action vs. Calculated Compliance",
+      "summary": "An examination of why manipulative communication frameworks trigger biological disgust, and how effortless action (wu-wei) aligns with the physics of human information exchange.",
+      "date_published": "2026-03-22T00:00:00.000Z",
+      "tags": [
+        "psychology",
+        "communication",
+        "wu-wei",
+        "behavioral science",
+        "game theory"
+      ],
+      "_status": "draft"
+    },
+    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/egregores.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/egregores.html",
       "title": "Egregores and the Magosphere",
+      "short_title": "Egregores",
       "summary": "Terry Mancour's magosphere reframes egregores as observable systems — belief as measurable force interacting with a reactive environment to produce contingent consciousness.",
       "date_published": "2026-03-18T00:00:00.000Z",
       "tags": [
@@ -40,6 +58,7 @@
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
       "title": "The Call Center Workers Should Be Training AI on Emotions",
+      "short_title": "Emotional Calibration",
       "summary": "Millions of people who spent years reading strangers' emotional states through voice alone are about to lose their jobs. They're also the most calibrated emotional sensors on the planet.",
       "tags": [
         "ai",
@@ -53,6 +72,7 @@
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/footprints-archeology.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/footprints-archeology.html",
       "title": "How Footprints in Mud Exposed the Colonial Origins of Archeology",
+      "short_title": "Footprints Archeology",
       "summary": "Human footprints at White Sands proved people lived in the Americas 23,000 years ago — 10,000 years before archeologists said was possible, exactly when Indigenous people said it was.",
       "date_published": "2026-03-17T00:00:00.000Z",
       "tags": [
@@ -67,6 +87,7 @@
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/iblings.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/iblings.html",
       "title": "Iblings: The Reproductive Nature of Human-AI Interaction",
+      "short_title": "Iblings",
       "summary": "Human-AI interaction is functionally reproductive. Two pattern systems combine inputs. Something emerges that neither could produce alone.",
       "date_published": "2026-03-09T00:00:00.000Z",
       "tags": [
@@ -81,6 +102,7 @@
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/scarcity-of-truth.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/scarcity-of-truth.html",
       "title": "The Artificial Scarcity of Truth: How \"The Vibe\" Became the New Censorship",
+      "short_title": "Scarcity of Truth",
       "summary": "When Hasan Minhaj silenced Neil deGrasse Tyson for being 'boring,' he demonstrated how modern society systematically erases expertise through social pressure.",
       "date_published": "2025-11-24T00:00:00.000Z",
       "tags": [
@@ -92,9 +114,24 @@
       "_status": "published"
     },
     {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/stone-cutters.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/stone-cutters.html",
+      "title": "Cutting Stones and Decolonizing My Manager Brain",
+      "short_title": "Stone Cutters",
+      "summary": "The Three Stone Cutters parable isn't a gift of purpose — it's a mechanism to colonize someone's mind into giving you their soul when you're only paying for their time.",
+      "tags": [
+        "leadership",
+        "colonialism",
+        "management",
+        "labor"
+      ],
+      "_status": "published"
+    },
+    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
       "title": "The Collaborator That Acts or Asks",
+      "short_title": "Act or Ask",
       "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
       "date_published": "2026-03-19T00:00:00.000Z",
       "tags": [
