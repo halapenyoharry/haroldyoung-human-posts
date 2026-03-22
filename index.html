@@ -315,7 +315,7 @@ class PostGraph {
 }
 
 // Load feed.json → build graph → render
-fetch('./feed.json')
+fetch(`./feed.json?v=${Date.now()}`)
   .then(r => r.json())
   .then(feed => {
     const graph = new PostGraph('graph');
