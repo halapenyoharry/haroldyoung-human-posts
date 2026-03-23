@@ -5,7 +5,7 @@
   "feed_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/feed.json",
   "authors": [
     {
-      "name": "Harold Young"
+      "name": "harold young"
     }
   ],
   "items": [
@@ -15,14 +15,27 @@
       "title": "AI Oligarchs Are Driving Without Insurance",
       "short_title": "AI Insurance",
       "summary": "OpenAI operates machines that introduce far greater systemic risk than any vehicle, yet they are entirely exempt from liability insurance.",
+      "tldr": "",
       "image": "",
       "date_published": "2026-03-18T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "ai",
         "legal",
         "insurance",
         "externalities"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -31,8 +44,10 @@
       "title": "The Mechanics of Effortless Action vs. Calculated Compliance",
       "short_title": "Effortless Action vs. Calculated Compliance",
       "summary": "An examination of why manipulative communication frameworks trigger biological disgust, and how effortless action (wu-wei) aligns with the physics of human information exchange.",
+      "tldr": "Using behavioral hacks like Chase Hughes' PCP model triggers evolved cognitive structures meant to detect social defection. True communication requires effortless action (wu-wei), where information is exchanged without forcing outcomes, preserving the long-term trust necessary for human cooperation.",
       "image": "https://halapenyoharry.github.io/haroldyoung-human-posts/covers/effortless-action.png",
       "date_published": "2026-03-22T00:00:00.000Z",
+      "reading_time": "7 min",
       "tags": [
         "psychology",
         "communication",
@@ -40,6 +55,19 @@
         "behavioral science",
         "game theory"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/effortless-action.html",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "bluesky": "",
+        "youtube": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "draft"
     },
     {
@@ -48,13 +76,26 @@
       "title": "Egregores and the Magosphere",
       "short_title": "Egregores",
       "summary": "Terry Mancour's magosphere reframes egregores as observable systems — belief as measurable force interacting with a reactive environment to produce contingent consciousness.",
+      "tldr": "",
       "image": "",
       "date_published": "2026-03-18T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "philosophy",
         "systems-theory",
         "sci-fi"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/egregores-and-the-magosphere-d024e21a5b82",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/egregores-and-the-magosphere-d024e21a5b82",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -63,13 +104,26 @@
       "title": "The Call Center Workers Should Be Training AI on Emotions",
       "short_title": "Emotional Calibration",
       "summary": "Millions of people who spent years reading strangers' emotional states through voice alone are about to lose their jobs. They're also the most calibrated emotional sensors on the planet.",
+      "tldr": "",
       "image": "",
+      "reading_time": "",
       "tags": [
         "ai",
         "labor",
         "open-source",
         "affective-computing"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "draft"
     },
     {
@@ -78,14 +132,27 @@
       "title": "How Footprints in Mud Exposed the Colonial Origins of Archeology",
       "short_title": "Footprints Archeology",
       "summary": "Human footprints at White Sands proved people lived in the Americas 23,000 years ago — 10,000 years before archeologists said was possible, exactly when Indigenous people said it was.",
+      "tldr": "",
       "image": "",
       "date_published": "2026-03-17T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "archaeology",
         "science",
         "colonialism",
         "indigenous-history"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/how-footprints-in-mud-exposed-the-colonial-origins-of-archeology-abec71d44b0f",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/how-footprints-in-mud-exposed-the-colonial-origins-of-archeology-abec71d44b0f",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -94,14 +161,27 @@
       "title": "Iblings: The Reproductive Nature of Human-AI Interaction",
       "short_title": "Iblings",
       "summary": "Human-AI interaction is functionally reproductive. Two pattern systems combine inputs. Something emerges that neither could produce alone.",
+      "tldr": "",
       "image": "",
       "date_published": "2026-03-09T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "ai",
         "philosophy",
         "consciousness",
         "iblings"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/iblings-the-reproductive-nature-of-human-ai-interaction-c0c98298e325",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/iblings-the-reproductive-nature-of-human-ai-interaction-c0c98298e325",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -110,14 +190,27 @@
       "title": "The Artificial Scarcity of Truth: How \"The Vibe\" Became the New Censorship",
       "short_title": "Scarcity of Truth",
       "summary": "When Hasan Minhaj silenced Neil deGrasse Tyson for being 'boring,' he demonstrated how modern society systematically erases expertise through social pressure.",
+      "tldr": "",
       "image": "",
       "date_published": "2025-11-24T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "truth",
         "media",
         "epistemology",
         "censorship"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/the-artificial-scarcity-of-truth-how-the-vibe-became-the-new-censorship-b730f104b1a0",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/the-artificial-scarcity-of-truth-how-the-vibe-became-the-new-censorship-b730f104b1a0",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -126,13 +219,28 @@
       "title": "Cutting Stones and Decolonizing My Manager Brain",
       "short_title": "Stone Cutters",
       "summary": "The Three Stone Cutters parable isn't a gift of purpose — it's a mechanism to colonize someone's mind into giving you their soul when you're only paying for their time.",
+      "tldr": "The 'Cathedral Builder' story is corporate colonization — the honest stone cutter who kept his soul was right all along.",
       "image": "",
+      "reading_time": "2",
       "tags": [
         "leadership",
         "colonialism",
         "management",
         "labor"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "fictional — unknown author, found by Isaac Miranda in the upcoming novel 'The Epic of Elinor Jones'",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "bluesky": "",
+        "youtube": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "published"
     },
     {
@@ -141,14 +249,27 @@
       "title": "The Collaborator That Acts or Asks",
       "short_title": "Act or Ask",
       "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
+      "tldr": "",
       "image": "",
       "date_published": "2026-03-19T00:00:00.000Z",
+      "reading_time": "",
       "tags": [
         "ai",
         "collaboration",
         "workflow",
         "adaptive-execution"
       ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
       "_status": "draft"
     }
   ]
