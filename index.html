@@ -37,8 +37,11 @@
   #graph { width: 100vw; height: 100vh; }
   .node { cursor: pointer; overflow: visible; }
   .node text { fill: #ccc; pointer-events: none; font-family: 'Atkinson', sans-serif; }
-  svg { overflow: visible; }
+  svg { overflow: visible; user-select: none; -webkit-user-select: none; }
   .link { stroke: #555; stroke-opacity: 0.4; stroke-width: 1.5; }
+  .link.highlighted { stroke: var(--accent); stroke-opacity: 0.8; stroke-width: 2; }
+  .node.dimmed { opacity: 0.2; }
+  .tag-active rect, .tag-active ellipse { filter: drop-shadow(0 0 6px var(--accent)); }
 
   #tooltip {
     position: fixed; display: none; background: #16213e; border: 1px solid #0f3460;
@@ -655,6 +658,64 @@ class PostGraph {
         this.tooltip.style.top = (event.clientY + 16) + 'px';
       })
       .on('mouseout', () => { this.tooltip.style.display = 'none'; });
+
+    // Tag click: arrange connected articles around tag, dim everything else
+    // Click same tag again to restore
+    let activeTag = null;
+
+    nodes.filter(d => d.type === 'tag')
+      .on('click', (event, d) => {
+        event.stopPropagation();
+        if (activeTag === d.id) {
+          // Restore
+          activeTag = null;
+          nodes.classed('dimmed', false).classed('tag-active', false);
+          links.classed('highlighted', false);
+          this.simulation.force('x', null).force('y', null);
+          this.simulation.alpha(0.4).restart();
+        } else {
+          activeTag = d.id;
+          // Find connected article IDs
+          const connected = new Set(
+            data.links.filter(l => {
+              const sid = typeof l.source === 'object' ? l.source.id : l.source;
+              const tid = typeof l.target === 'object' ? l.target.id : l.target;
+              return sid === d.id || tid === d.id;
+            }).map(l => {
+              const sid = typeof l.source === 'object' ? l.source.id : l.source;
+              const tid = typeof l.target === 'object' ? l.target.id : l.target;
+              return sid === d.id ? tid : sid;
+            })
+          );
+          connected.add(d.id);
+
+          nodes.classed('dimmed', nd => !connected.has(nd.id));
+          nodes.classed('tag-active', nd => nd.id === d.id);
+          links.classed('highlighted', l => {
+            const sid = typeof l.source === 'object' ? l.source.id : l.source;
+            const tid = typeof l.target === 'object' ? l.target.id : l.target;
+            return sid === d.id || tid === d.id;
+          });
+
+          // Pull connected nodes toward tag center
+          const cx = this.width / 2, cy = this.height / 2;
+          this.simulation
+            .force('x', d3.forceX(nd => connected.has(nd.id) ? cx : (nd.x < cx ? cx - 500 : cx + 500)).strength(nd => connected.has(nd.id) ? 0.3 : 0.15))
+            .force('y', d3.forceY(cy).strength(nd => connected.has(nd.id) ? 0.3 : 0.1));
+          this.simulation.alpha(0.6).restart();
+        }
+      });
+
+    // Click background to clear tag selection
+    this.svg.on('click', () => {
+      if (activeTag) {
+        activeTag = null;
+        nodes.classed('dimmed', false).classed('tag-active', false);
+        links.classed('highlighted', false);
+        this.simulation.force('x', null).force('y', null);
+        this.simulation.alpha(0.4).restart();
+      }
+    });
 
     this.simulation.nodes(data.nodes).on('tick', () => {
       links.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
