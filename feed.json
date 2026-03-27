@@ -10,35 +10,6 @@
   ],
   "items": [
     {
-      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
-      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
-      "title": "AI Oligarchs Are Driving Without Insurance",
-      "short_title": "AI Insurance",
-      "summary": "OpenAI operates machines that introduce far greater systemic risk than any vehicle, yet they are entirely exempt from liability insurance.",
-      "tldr": "",
-      "image": "",
-      "date_published": "2026-03-18T00:00:00.000Z",
-      "reading_time": "",
-      "tags": [
-        "ai",
-        "legal",
-        "insurance",
-        "externalities"
-      ],
-      "series": "",
-      "series_part": null,
-      "license": "",
-      "canonical_url": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
-      "syndication": {
-        "medium": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
-        "substack": "",
-        "linkedin": "",
-        "hackernews": "",
-        "reddit": ""
-      },
-      "_status": "published"
-    },
-    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/effortless-action.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/effortless-action.html",
       "title": "The Mechanics of Effortless Action vs. Calculated Compliance",
@@ -71,6 +42,64 @@
       "_status": "draft"
     },
     {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
+      "title": "The Collaborator That Acts or Asks",
+      "short_title": "Act or Ask",
+      "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
+      "tldr": "",
+      "image": "",
+      "date_published": "2026-03-19T00:00:00.000Z",
+      "reading_time": "",
+      "tags": [
+        "ai",
+        "collaboration",
+        "workflow",
+        "adaptive-execution"
+      ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
+      "_status": "draft"
+    },
+    {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/ai-insurance.html",
+      "title": "AI Oligarchs Are Driving Without Insurance",
+      "short_title": "AI Insurance",
+      "summary": "OpenAI operates machines that introduce far greater systemic risk than any vehicle, yet they are entirely exempt from liability insurance.",
+      "tldr": "",
+      "image": "",
+      "date_published": "2026-03-18T00:00:00.000Z",
+      "reading_time": "",
+      "tags": [
+        "ai",
+        "legal",
+        "insurance",
+        "externalities"
+      ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
+      "syndication": {
+        "medium": "https://medium.com/@halapenyoharry/ai-oligarchs-are-driving-with-out-insurance-198f920cfcb9",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
+      "_status": "published"
+    },
+    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/egregores.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/egregores.html",
       "title": "Egregores and the Magosphere",
@@ -97,34 +126,6 @@
         "reddit": ""
       },
       "_status": "published"
-    },
-    {
-      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
-      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
-      "title": "The Call Center Workers Should Be Training AI on Emotions",
-      "short_title": "Emotional Calibration",
-      "summary": "Millions of people who spent years reading strangers' emotional states through voice alone are about to lose their jobs. They're also the most calibrated emotional sensors on the planet.",
-      "tldr": "",
-      "image": "",
-      "reading_time": "",
-      "tags": [
-        "ai",
-        "labor",
-        "open-source",
-        "affective-computing"
-      ],
-      "series": "",
-      "series_part": null,
-      "license": "",
-      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
-      "syndication": {
-        "medium": "",
-        "substack": "",
-        "linkedin": "",
-        "hackernews": "",
-        "reddit": ""
-      },
-      "_status": "draft"
     },
     {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/footprints-archeology.html",
@@ -214,6 +215,34 @@
       "_status": "published"
     },
     {
+      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "title": "The Call Center Workers Should Be Training AI on Emotions",
+      "short_title": "Emotional Calibration",
+      "summary": "Millions of people who spent years reading strangers' emotional states through voice alone are about to lose their jobs. They're also the most calibrated emotional sensors on the planet.",
+      "tldr": "",
+      "image": "",
+      "reading_time": "",
+      "tags": [
+        "ai",
+        "labor",
+        "open-source",
+        "affective-computing"
+      ],
+      "series": "",
+      "series_part": null,
+      "license": "",
+      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/emotional-calibration.html",
+      "syndication": {
+        "medium": "",
+        "substack": "",
+        "linkedin": "",
+        "hackernews": "",
+        "reddit": ""
+      },
+      "_status": "draft"
+    },
+    {
       "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/stone-cutters.html",
       "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/stone-cutters.html",
       "title": "Cutting Stones and Decolonizing My Manager Brain",
@@ -242,35 +271,6 @@
         "reddit": ""
       },
       "_status": "published"
-    },
-    {
-      "id": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
-      "url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-ask.html",
-      "title": "The Collaborator That Acts or Asks",
-      "short_title": "Act or Ask",
-      "summary": "Most tools wait for instructions. The useful ones follow a protocol: attempt everything autonomously, stop only at genuine structural barriers, escalate with surgical precision, resume from exactly where they stopped.",
-      "tldr": "",
-      "image": "",
-      "date_published": "2026-03-19T00:00:00.000Z",
-      "reading_time": "",
-      "tags": [
-        "ai",
-        "collaboration",
-        "workflow",
-        "adaptive-execution"
-      ],
-      "series": "",
-      "series_part": null,
-      "license": "",
-      "canonical_url": "https://halapenyoharry.github.io/haroldyoung-human-posts/act-or-ask.html",
-      "syndication": {
-        "medium": "",
-        "substack": "",
-        "linkedin": "",
-        "hackernews": "",
-        "reddit": ""
-      },
-      "_status": "draft"
     }
   ]
 }
